@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="http://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous">
+    </script>
+</head>
+<body>
+{{ username }}
+<form method="post">
+    <input type="text" name="type" hidden value="logout">
+    <input type="submit" value="Logout">
+</form>
+<div id="chat">
+
+</div>
+<div>
+    <input id="message-text" type="text">
+    <button onclick="sendMessage()">Отправить</button>
+</div>
+
+<script>
+    let qeq;
+    function getMessages(){
+        $.ajax({
+            url: '/api/message',
+            method: 'GET',
+            success: function (data) {
+                if(data != '404') {
+                    data = JSON.parse(data);
+                    qeq = data;
+                    console.log(data);
+                    for (let i = 0; i < data.length; i++) {
+                        $('#chat').append('<div class="message"><div class="sender">' + data[i]['sender'] + '</div><div class="text">' + data[i]['text'] + '</div></div>');
+                    }
+                }
+                getMessages();
+            },
+            timeout: 500000
+        });
+    }
+
+    function sendMessage(){
+        $.ajax({
+            url: '/api/message',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                'text': $('#message-text').val()
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+            url: '/api/connect',
+            method: 'GET'
+        });
+        getMessages();
+    });
+
+    $(window).on('beforeunload', function () {
+        $.ajax({
+            url: '/api/disconnect',
+            method: 'GET'
+        });
+    });
+</script>
+</body>
+</html>
