@@ -1,0 +1,39 @@
+body {
+    font-size: 20px;
+    background-color: #1924B1;
+}
+
+.message {
+    display: flex;
+    border-radius: 10px;
+}
+
+.message div {
+    margin: 10px;
+}
+
+.sender {
+    font-weight: bold;
+}
+
+.block {
+    background-color: #7279D8;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.our {
+    background-color: rgba(0,0,0,0.2);
+}
+
+input[type=text] {
+    width: 80%;
+    border-radius: 1px;
+    border: none;
+}
+
+#chat {
+    height: 600px;
+    overflow: auto;
+}

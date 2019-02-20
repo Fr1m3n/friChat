@@ -44,7 +44,13 @@ def apiMessageHandler():
             sleep(1)
         if session['username'] in message_queue:
             username = session['username']
-            ans = dumps(message_queue[username])
+            ans = dumps({
+                'messages': message_queue[username],
+                'info': {
+                    'online_users': len(message_queue),
+                    'users': [user for user in message_queue.keys()]
+                }
+            })
             message_queue[username] = []
             return ans
     else:

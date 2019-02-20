@@ -8,66 +8,115 @@
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous">
     </script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/main.css') }}">
 </head>
 <body>
-{{ username }}
-<form method="post">
-    <input type="text" name="type" hidden value="logout">
-    <input type="submit" value="Logout">
-</form>
-<div id="chat">
-
-</div>
 <div>
-    <input id="message-text" type="text">
-    <button onclick="sendMessage()">Отправить</button>
-</div>
+    <input type="text" hidden value="{{ username }}" id="username">
 
+
+    <div class="block">
+        <div id="chat">
+
+        </div>
+        <div>
+            <input id="message-text" type="text">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+    <div class="block">
+        <div class="info">
+            <div id="username">Имя пользователя: {{ username }}</div>
+            <div id="users">
+                <div id="users-count">
+                    Пользователей онлайн <span></span>
+                </div>
+                <button onclick="$('#users-list').toggle('2')"> Раскрыть список</button>
+                <div id="users-list" style="display: none">
+
+                </div>
+                <form method="post">
+                    <input type="text" name="type" hidden value="logout">
+                    <input type="submit" value="Logout" onclick="disconnect()">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     let qeq;
-    function getMessages(){
+    let username = $('#username').val();
+
+    function getMessages() {
         $.ajax({
             url: '/api/message',
             method: 'GET',
             success: function (data) {
-                if(data != '404') {
+                if (data != '404') {
                     data = JSON.parse(data);
                     qeq = data;
                     console.log(data);
-                    for (let i = 0; i < data.length; i++) {
-                        $('#chat').append('<div class="message"><div class="sender">' + data[i]['sender'] + '</div><div class="text">' + data[i]['text'] + '</div></div>');
+                    let messages = data['messages'];
+                    $('#users-count span')[0].innerHTML = data['info']['online_users'];
+                    for (let i = 0; i < messages.length; i++) {
+                        let addClass = '';
+                        if (messages[i]['sender'] == username)
+                            addClass = 'our';
+                        $('#chat').append('<div class="message ' + addClass + '"><div class="sender">' + messages[i]['sender'] + '</div><div class="text">' + messages[i]['text'] + '</div></div>');
+                    }
+                    $('#users-list').empty();
+                    for(let i = 0; i < data['info']['online_users']; i++){
+                        $('#users-list').append('<div>' + data['info']['users'][i] + '</div>');
                     }
                 }
+                $('#chat').scrolltop = 99999999;
                 getMessages();
             },
-            timeout: 500000
+            timeout: 500000,
+            error: function () {
+                getMessages();
+            }
         });
     }
 
-    function sendMessage(){
+    function sendMessage() {
         $.ajax({
             url: '/api/message',
             method: 'POST',
             dataType: 'json',
             data: {
                 'text': $('#message-text').val()
+            },
+            success: function () {
+                getMessages();
             }
-        })
+        });
+        $('#message-text').val('');
+
     }
 
-    $(document).ready(function () {
-        $.ajax({
+    function connect(){
+       $.ajax({
             url: '/api/connect',
-            method: 'GET'
+            method: 'GET',
+            async: false
         });
-        getMessages();
-    });
+    }
 
-    $(window).on('beforeunload', function () {
+    function disconnect(){
         $.ajax({
             url: '/api/disconnect',
             method: 'GET'
         });
+    }
+
+    $(document).ready(function () {
+        connect();
+        getMessages();
+    });
+
+    $(window).on('beforeunload', function () {
+        disconnect();
     });
 </script>
 </body>
