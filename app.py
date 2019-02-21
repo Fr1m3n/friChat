@@ -38,6 +38,7 @@ def pageLoader():
 @app.route('/api/message', methods=['GET', 'POST'])
 def apiMessageHandler():
     if 'username' not in session or session['username'] not in message_queue:
+        print(session)
         return '404'
     if request.method == 'GET':
         while len(message_queue[session['username']]) == 0:
