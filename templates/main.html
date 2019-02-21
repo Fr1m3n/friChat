@@ -31,7 +31,7 @@
                 <div id="users-count">
                     Пользователей онлайн <span></span>
                 </div>
-                <button onclick="$('#users-list').toggle('2')"> Раскрыть список</button>
+                <button onclick="$('#users-list').toggle('2')"> Список пользователей</button>
                 <div id="users-list" style="display: none">
 
                 </div>
@@ -62,7 +62,7 @@
                         let addClass = '';
                         if (messages[i]['sender'] == username)
                             addClass = 'our';
-                        $('#chat').append('<div class="message ' + addClass + '"><div class="sender">' + messages[i]['sender'] + '</div><div class="text">' + messages[i]['text'] + '</div></div>');
+                        $('#chat').prepend('<div class="message ' + addClass + '"><div class="sender">' + messages[i]['sender'] + '</div><div class="text">' + messages[i]['text'] + '</div></div>');
                     }
                     $('#users-list').empty();
                     for(let i = 0; i < data['info']['online_users']; i++){
